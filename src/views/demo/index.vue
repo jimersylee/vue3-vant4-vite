@@ -1,54 +1,56 @@
-<script setup lang="ts" name="Demo">
-import { reactive } from "vue";
+<script setup lang="ts">
+import {reactive, ref} from "vue";
+import {showToast} from "vant";
 
-const contentList = reactive([
-  "✔ ⚡ Vue3 + Vite4",
-  "✔ 🍕 TypeScript",
-  "✔ ✨ Vant4 组件库",
-  "✔ 🌀 Tailwindcss 原子类框架",
-  "✔ 🍍 Pinia 状态管理",
-  "✔ 🌓 支持深色模式",
-  "✔ Vue-router 4",
-  "✔ 支持 SVG 图标自动注册组件",
-  "✔ vw 视口适配",
-  "✔ Axios 封装",
-  "✔ 打包资源 gzip 压缩",
-  "✔ 开发环境支持 Mock 数据",
-  "✔ ESLint",
-  "✔ 首屏加载动画",
-  "✔ 开发环境调试面板"
-]);
+const list = ref([]);
+const loading = ref(false);
+const finished = ref(false);
+const value = ref('');
+const onSearch = (val) => showToast(val);
+const onCancel = () => showToast('取消');
+const onLoad = () => {
+  loading.value = true;
+  setTimeout(() => {
+    for (let i = 0; i < 10; i++) {
+      list.value.push("item");
+    }
+    loading.value = false;
+    if (list.value.length >= 6) {
+      finished.value = true;
+    }
+  }, 500);
+};
 </script>
 
 <template>
   <div class="demo-content px-[12px]">
-    <img
-      class="block w-[120px] mx-auto mb-[20px] pt-[30px]"
-      alt="Vue logo"
-      src="~@/assets/logo_melomini.png"
-    />
-    <div class="pl-[12px] border-l-[3px] border-[color:#41b883]">
-      <a
-        class="flex items-center"
-        href="https://github.com/yulimchen/vue3-h5-template"
-        target="_blank"
-      >
-        <svg-icon class="text-[20px] mr-[8px]" name="github" />
-        <h3 class="font-bold text-[18px] my-[4px]">Vue3-h5-template</h3>
-        <svg-icon class="text-[12px] ml-[5px]" name="link" />
-      </a>
-    </div>
-    <div
-      class="text-[14px] py-[2px] px-[10px] rounded-[4px] bg-[var(--color-block-background)] mt-[14px]"
-    >
-      <p class="my-[14px] leading-[24px]">
-        🌱 基于 Vue3 全家桶、TypeScript、Vite 构建工具，开箱即用的 H5
-        移动端项目基础模板
-      </p>
-    </div>
+    <form action="/">
+      <van-search
+          v-model="value"
+          show-action
+          placeholder="请输入搜索关键词"
+          @search="onSearch"
+          @cancel="onCancel"
+      />
+    </form>
+    <van-divider class="my-[12px]" />
+    <van-tabs>
+      <van-tab title="客厅">
+        <van-list
+            v-model:loading="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+        >
+          <van-cell v-for="item in list" :key="item" :title="item" />
+        </van-list>
+      </van-tab>
+      <van-tab title="卧室1">
+        <van-empty image="search" description="没有更多了" />
+      </van-tab>
+      <van-tab title="卧室2">没有</van-tab>
+      <van-tab title="卫生间">没有</van-tab>
+    </van-tabs>
 
-    <div class="demo-main">
-      <van-cell v-for="(item, idx) in contentList" :key="idx" :title="item" />
-    </div>
   </div>
 </template>
